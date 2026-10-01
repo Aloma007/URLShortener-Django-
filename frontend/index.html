@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background matching the reference */
+        }
+        
+        .toast-enter {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        .toast-enter-active {
+            transform: translateY(0);
+            opacity: 1;
+            transition: all 0.3s ease-out;
+        }
+        .toast-exit {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast-exit-active {
+            transform: translateY(100%);
+            opacity: 0;
+            transition: all 0.3s ease-in;
+        }
+    </style>
+</head>
+<body class="text-gray-800 flex flex-col min-h-screen">
+
+    <header class="w-full bg-black shadow-sm py-4">
+        <div class="max-w-5xl mx-auto px-4 flex justify-center md:justify-start items-center">
+            <a href="#" class="flex items-center gap-2 text-2xl font-bold text-blue-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 256 256"><rect width="256" height="256" fill="none"/><path d="M136,120v64a40,40,0,0,1-80,0V136" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><path d="M120,136V72a40,40,0,0,1,80,0v48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><line x1="96" y1="128" x2="160" y2="128" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/></svg>
+                ShortURL <sub class="text-sm font-medium text-gray-500 relative top-1"><b>by Aloma<b></sub>
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-grow w-full max-w-5xl mx-auto px-4 py-8 space-y-12">
+
+        <section class="bg-white shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] rounded-xl p-6 md:p-10 text-center max-w-3xl mx-auto border border-gray-100">
+            <h2 class="text-2xl md:text-3xl font-semibold mb-6 text-gray-800">Paste the URL to be shortened</h2>
+            
+            <form id="shortenForm" class="flex flex-col md:flex-row gap-3 md:gap-0 w-full mb-4 relative">
+                <input 
+                    type="url" 
+                    id="urlInput"
+                    placeholder="Enter the link here" 
+                    required
+                    class="flex-grow px-5 py-4 text-lg border border-gray-300 rounded-md md:rounded-r-none md:rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow"
+                >
+                <button 
+                    type="submit" 
+                    id="submitBtn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg px-8 py-4 rounded-md md:rounded-l-none md:rounded-r-md transition-colors flex items-center justify-center min-w-[160px]"
+                >
+                    <span id="btnText">Shorten URL</span>
+                    <svg id="loadingIcon" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </form>
+
+            <p class="text-gray-500 text-sm mt-4 leading-relaxed">
+                Short URL is a free tool to shorten URLs and generate short links.<br class="hidden md:block">
+                URL shortener allows to create a shortened link making it easy to share.
+            </p>
+
+            <!-- Result Box (Hidden by default) -->
+            <div id="resultBox" class="hidden mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md flex flex-col md:flex-row items-center justify-between gap-4 transition-all">
+                <div class="text-left flex-grow w-full md:w-auto overflow-hidden">
+                    <p class="text-sm text-gray-500 mb-1">Your shortened URL:</p>
+                    <a id="shortenedLink" href="#" target="_blank" class="text-lg text-blue-600 font-medium truncate block hover:underline"></a>
+                </div>
+                <button id="copyBtn" type="button" class="w-full md:w-auto px-6 py-2 bg-white border border-blue-600 text-blue-600 rounded hover:bg-blue-50 font-medium transition-colors">
+                    Copy Link
+                </button>
+            </div>
+        </section>
+
+        <section class="max-w-4xl mx-auto px-2 space-y-8">
+            <div>
+                <h3 class="text-xl font-bold mb-2">Simple and fast URL shortener!</h3>
+                <p class="text-gray-700 text-sm leading-relaxed">
+                    Short URL allows to shorten long links from <a href="#" class="text-blue-600 hover:underline">Instagram</a>, <a href="#" class="text-blue-600 hover:underline">Facebook</a>, <a href="#" class="text-blue-600 hover:underline">YouTube</a>, <a href="#" class="text-blue-600 hover:underline">Twitter</a>, <a href="#" class="text-blue-600 hover:underline">Linked In</a>, <a href="#" class="text-blue-600 hover:underline">WhatsApp</a>, <a href="#" class="text-blue-600 hover:underline">TikTok</a>, blogs and sites. Just paste the long URL and click the Shorten URL button. On the next page, copy the shortened URL and share it on sites, chat and emails. After shortening the URL, check <a href="#" class="text-blue-600 hover:underline">how many clicks it received</a>.
+                </p>
+            </div>
+            
+            <div>
+                <h3 class="text-xl font-bold mb-2">Shorten, share and track</h3>
+                <p class="text-gray-700 text-sm leading-relaxed">
+                    Your shortened URLs can be used in publications, documents, advertisements, blogs, forums, instant messages, and other locations. Track statistics for your business and projects by monitoring the number of hits from your URL with our click counter.
+                </p>
+            </div>
+        </section>
+
+        <section class="max-w-5xl mx-auto border-t border-gray-200 pt-12 pb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-12 gap-x-8 text-center">
+                
+                <!-- Feature 1: Easy -->
+                <div class="flex flex-col items-center">
+                    <div class="w-16 h-16 flex items-center justify-center text-blue-600 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.514" />
+                        </svg>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2">Easy</h4>
+                    <p class="text-gray-600 text-sm">Short URL is easy and fast, enter the long link to get your shortened link</p>
+                </div>
+
+                <!-- Feature 2: Shortened -->
+                <div class="flex flex-col items-center">
+                    <div class="w-16 h-16 flex items-center justify-center text-blue-600 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                        </svg>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2">Shortened</h4>
+                    <p class="text-gray-600 text-sm">Use any link, no matter what size, Short URL always shortens</p>
+                </div>
+
+                <!-- Feature 3: Secure -->
+                <div class="flex flex-col items-center">
+                    <div class="w-16 h-16 flex items-center justify-center text-blue-600 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2">Secure</h4>
+                    <p class="text-gray-600 text-sm">It is fast and secure, our service has HTTPS protocol and data encryption</p>
+                </div>
+
+                <!-- Feature 4: Statistics -->
+                <div class="flex flex-col items-center">
+                    <div class="w-16 h-16 flex items-center justify-center text-blue-600 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M3 13h2.25l2.25 9 1.5-9 2.25 9 2.25-9 1.5 9 2.25-9H21" />
+                        </svg>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2">Statistics</h4>
+                    <p class="text-gray-600 text-sm">Check the number of clicks that your shortened URL received by hitting (Refresh statistics)</p>
+                </div>
+
+                <!-- Feature 5: Reliable -->
+                <div class="flex flex-col items-center">
+                    <div class="w-16 h-16 flex items-center justify-center text-blue-600 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                        </svg>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2">Reliable</h4>
+                    <p class="text-gray-600 text-sm">All links that try to disseminate spam, viruses and malware are deleted</p>
+                </div>
+
+                <!-- Feature 6: Devices -->
+                <div class="flex flex-col items-center">
+                    <div class="w-16 h-16 flex items-center justify-center text-blue-600 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2">Devices</h4>
+                    <p class="text-gray-600 text-sm">Compatible with smartphones, tablets and desktop</p>
+                </div>
+                
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-800 text-white text-center py-6 mt-12">
+        <div class="container mx-auto px-4">
+            <p>&copy; 2026 ShortURL - Simple URL Shortening tool 🔥</p>
+            <p class="mt-2 text-sm text-slate-300">Contact us - 09130964520</p>
+        </div>
+    </footer>
+
+    <!-- Custom Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+
+    <script>
+        // DOM Elements
+        const form = document.getElementById('shortenForm');
+        const urlInput = document.getElementById('urlInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const loadingIcon = document.getElementById('loadingIcon');
+        const resultBox = document.getElementById('resultBox');
+        const shortenedLink = document.getElementById('shortenedLink');
+        const copyBtn = document.getElementById('copyBtn');
+        const toastContainer = document.getElementById('toastContainer');
+
+        // Custom Toast Notification Function (Replaces alert)
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            
+            // Set styles based on type
+            const bgColor = type === 'error' ? 'bg-red-500' : 'bg-gray-800';
+            
+            toast.className = `${bgColor} text-white px-6 py-3 rounded shadow-lg flex items-center gap-3 toast-enter-active`;
+            toast.innerHTML = `
+                <span class="font-medium">${message}</span>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('toast-enter-active');
+                toast.classList.add('toast-exit-active');
+                setTimeout(() => toast.remove(), 300); // Wait for exit animation
+            }, 3000);
+        }
+
+        // Generate a random mock short code (similar to Django backend logic)
+        function generateMockShortCode() {
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        // Handle Form Submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const originalUrl = urlInput.value.trim();
+            if (!originalUrl) return;
+
+            // UI State: Loading
+            btnText.textContent = 'Shortening...';
+            loadingIcon.classList.remove('hidden');
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
+            resultBox.classList.add('hidden');
+
+            try {
+                // Send the POST request to your Django backend
+                const response = await fetch('http://127.0.0.1:8000/shorten', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: originalUrl })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Extract the code and redirect to the next page
+                    const shortCode = data.shortCode || data.short_code;
+                    window.location.href = `result.html?code=${shortCode}`;
+                } else {
+                    // Handle bad requests from API
+                    showToast('Error: ' + JSON.stringify(data), 'error');
+                }
+            } catch(err) {
+                showToast('Failed to connect to backend server. Is Django running?', 'error');
+                console.error(err);
+            } finally {
+                // Reset Button State
+                btnText.textContent = 'Shorten URL';
+                loadingIcon.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                urlInput.value = '';
+            }
+        });
+
+        // Handle Copy to Clipboard
+        copyBtn.addEventListener('click', () => {
+            const textToCopy = shortenedLink.textContent;
+            
+            // Fallback strategy for iframe environments (like the interactive preview)
+            try {
+                // Try modern API first
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        showToast('Link copied to clipboard!');
+                    });
+                } else {
+                    // Fallback for older browsers or restricted iframes
+                    const textArea = document.createElement("textarea");
+                    textArea.value = textToCopy;
+                    // Move textarea out of viewport
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-999999px";
+                    textArea.style.top = "-999999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    
+                    document.execCommand('copy');
+                    textArea.remove();
+                    
+                    showToast('Link copied to clipboard!');
+                }
+            } catch (err) {
+                showToast('Failed to copy link', 'error');
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>

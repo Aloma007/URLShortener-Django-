@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShortURL - Result & Stats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen text-slate-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-600 flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                ShortURL<sub>by Aloma</sub>
+            </h1>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-16 max-w-2xl">
+        <div class="bg-white p-8 rounded-lg shadow-md text-center">
+            <h2 class="text-3xl font-bold mb-6">Your short link is ready!</h2>
+            
+            <!-- Copy Section -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
+                <input type="text" id="shortUrlInput" readonly class="w-full sm:w-2/3 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 text-lg font-medium text-gray-700">
+                <button id="copyBtn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg transition duration-200">Copy URL</button>
+            </div>
+
+            <!-- Statistics Section -->
+            <div class="border-t border-gray-200 pt-8 mt-4">
+                <h3 class="text-xl font-semibold text-slate-700 mb-4">Link Statistics</h3>
+                <div class="bg-blue-50 border border-blue-100 rounded-lg p-6 inline-block w-full sm:w-2/3">
+                    <p class="text-gray-600 text-lg mb-2">Total Clicks Received</p>
+                    <p id="clickCount" class="text-5xl font-bold text-blue-600">--</p>
+                </div>
+                <div class="mt-6">
+                    <button id="refreshStatsBtn" class="text-sm text-slate-500 hover:text-blue-600 underline">Refresh Statistics</button>
+                </div>
+            </div>
+            
+            <div class="mt-10">
+                <a href="index.html" class="text-blue-600 font-medium hover:underline">← Shorten another link</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-white text-center py-6 mt-12">
+        <div class="container mx-auto px-4">
+            <p>&copy; 2026 ShortURL - Simple URL Shortening tool 🔥</p>
+            <p class="mt-2 text-sm text-slate-300">Contact us - 09130964520</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // 1. Get the short code from the URL (e.g., ?code=abc123)
+        const urlParams = new URLSearchParams(window.location.search);
+        const shortCode = urlParams.get('code');
+        
+        const shortUrlInput = document.getElementById('shortUrlInput');
+        const clickCountDisplay = document.getElementById('clickCount');
+        const copyBtn = document.getElementById('copyBtn');
+        const refreshStatsBtn = document.getElementById('refreshStatsBtn');
+
+        // Construct the full short URL
+        const fullShortUrl = `http://127.0.0.1:8000/${shortCode}`;
+        
+        if (shortCode) {
+            shortUrlInput.value = fullShortUrl;
+            fetchStatistics();
+        } else {
+            // If someone navigates to this page without a code, send them back
+            window.location.href = 'index.html';
+        }
+
+        // 2. Handle Copy Button
+        copyBtn.addEventListener('click', () => {
+            shortUrlInput.select();
+            document.execCommand('copy');
+            
+            // Visual feedback
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = 'Copied!';
+            copyBtn.classList.replace('bg-blue-600', 'bg-green-600');
+            copyBtn.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+            
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+                copyBtn.classList.replace('bg-green-600', 'bg-blue-600');
+                copyBtn.classList.replace('hover:bg-green-700', 'hover:bg-blue-700');
+            }, 2000);
+        });
+
+        // 3. Fetch Statistics from your Django API
+        async function fetchStatistics() {
+            clickCountDisplay.textContent = '...';
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/shorten/${shortCode}/stats`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    clickCountDisplay.textContent = data.accessCount;
+                } else {
+                    clickCountDisplay.textContent = 'Error';
+                }
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+                clickCountDisplay.textContent = 'Offline';
+            }
+        }
+
+        // Allow manual refresh of stats
+        refreshStatsBtn.addEventListener('click', fetchStatistics);
+    </script>
+</body>
+</html>

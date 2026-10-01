@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from .models import ShortURL
 from .serializers import ShortURLSerializer
 
@@ -51,3 +51,14 @@ class ShortURLStats(APIView):
         serializer = ShortURLSerializer(url_obj)
         # We only retrieve the data here; we do not increase the access count
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+def redirect_to_original(request, shortCode):
+    # Find the URL in the database
+    url_obj = get_object_or_404(ShortURL, short_code=shortCode)
+    
+    # Add to the access count
+    url_obj.access_count += 1
+    url_obj.save()
+    
+    # Physically redirect the browser to the YouTube/Original link
+    return redirect(url_obj.url)
