@@ -95,6 +95,9 @@ Follow these steps to get the project running on your local machine.
 *   **Description:** Returns the URL data including the total `accessCount` without incrementing the tracker.
 *   **Success Response:** `200 OK`
 
+## Check out Live Web App below 👇🏽😇
+https://urlshortener-django-frontend.vercel.app/
+
 ## 🤝 Contributing
 Contributions, issues, and feature requests are kindly welcome! 
 
